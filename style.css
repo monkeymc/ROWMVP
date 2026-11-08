@@ -196,6 +196,11 @@ button{cursor:pointer}
 .island-bosses.detached .boss-marker{border-color:#e07a6e;background:radial-gradient(circle at 50% 35%,#6a3a3f,#2a1520);box-shadow:0 0 0 1px #3a1c25,0 0 10px #d8655c80}
 .island-bosses.detached .boss-marker img{object-fit:cover}
 .island-bosses.detached .marker-name{background:#3a1c25;color:#ffe2d6;font-size:10px}
+.pin.s2 i{border-color:#4fd6c8;background:#0a2838;color:#c4fbf3}
+.pin.s2 span{background:#08202ee8;border-color:#4fd6c866;color:#d8fffa}
+.pin.s2[aria-pressed=true] span,.pin.s2:hover span{background:#4fd6c8;color:#06202a;border-color:#4fd6c8}
+.island-bosses.s2 .boss-marker{border-color:#4fd6c8;background:radial-gradient(circle at 50% 35%,#1d5a6c,#05131d);box-shadow:0 0 0 1px #08202e,0 0 12px #4fd6c890}
+.island-bosses.s2 .marker-name{background:#08202e;color:#d8fffa}
 #lair.pending .slot-head .btn,#lair.pending .hand-legend,#lair.pending .note{visibility:hidden}
 #lair.pending .portrait img{object-fit:cover}
 .chart-head h1,.chart-head p{width:fit-content;max-width:100%}

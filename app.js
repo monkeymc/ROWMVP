@@ -32,10 +32,11 @@
     ['Orc Highlands',[80],-27,-50,'#c0a270'],['Sunken Desert',[100,110],31,-34,'#edbb7a'],
     ['Glast Ruins',[120],-17,2,'#ab99c4'],['Abyss Coast',[130],12,49,'#71c5bd'],
     ['Clockwork Wastes',[140],61,18,'#c19784'],['Frost Peaks',[150],85,-35,'#c4e5e8'],
-    ['Apocalypse',[],58,-96,'#b48a68',true]
+    ['Apocalypse',[],58,-96,'#b48a68','S1'],['Apocalypse',[],88,-96,'#4f9396','S2']
   ];
-  // A detached island lists bosses by region name instead of level and has no sea route.
-  const inRegion=(b,i)=>regions[i][5]?b.region===regions[i][0]:!b.region&&regions[i][1].includes(b.lv);
+  // A detached island holds one Apocalypse season: it lists bosses by season instead of level and has no sea route.
+  const inRegion=(b,i)=>regions[i][5]?b.season===regions[i][5]:!b.region&&regions[i][1].includes(b.lv);
+  const regionName=i=>regions[i][5]?regions[i][0]+' '+regions[i][5]:regions[i][0];
   const APOC_COLOR='#d8655c';
   let selected=-1, enteredHere=false;
   [...new Set(DATA.filter(b=>b.lv!=null).map(b=>b.lv))].forEach(n=>level.add(new Option('Lv. '+n,n)));
@@ -46,7 +47,7 @@
     $('bossList').innerHTML=found.map(b=>`<button class="entry" data-id="${b.id}"><span class="bicon"><img src="${TEX[b.img]}" alt=""></span><span><strong>${b.name}</strong><small>${b.pending?`<i style="background:${APOC_COLOR}"></i>${b.region} · ${b.season} · data pending`:`<i style="background:${EL_COLOR[b.el]}"></i>${b.el}${b.lv?` · Lv. ${b.lv}`:''}${b.region?` · ${b.region} ${b.season}`:''}`}</small></span><b class="chev">›</b></button>`).join('') || '<p class="no-results">No bosses match these filters.</p>';
     $('bossList').scrollTop=0;
     $('count').textContent=found.length+' of '+DATA.length+' bosses';
-    $('regionTitle').textContent=selected<0?'All regions':regions[selected][0];$('clear').hidden=!(selected>=0||q||level.value||element.value);
+    $('regionTitle').textContent=selected<0?'All regions':regionName(selected);$('clear').hidden=!(selected>=0||q||level.value||element.value);
     document.querySelectorAll('.pin').forEach((el,i)=>el.setAttribute('aria-pressed',i===selected));
   }
   function choose(i){selected=i;level.value=element.value=search.value='';renderIndex();if(matchMedia('(max-width:720px)').matches)document.querySelector('.guide').scrollIntoView({block:'start'});}
@@ -91,13 +92,13 @@
     function peak(x,z,s){solid(x,z,[[4,6*s,5*s],[10*s+4,2.4*s,2*s,1.2],[15*s+4,0,0,1.8]],6,['#8da9af','#f3f8e9']);}
     function hut(x,z,s){solid(x,z,[[4,s*2,s*2],[4+s*3,s*2,s*2],[4+s*3.2,s*2.8,s*2.8],[4+s*6.5,0,0]],4,['#eee1ad','#ae8f6f','#be7661'],Math.PI/4);}
     const pins=[], bossGroups=[], islands=[];
-    const compactCenters=[[-28,-69],[28,-69],[28,-23],[-28,-23],[-28,23],[28,23],[28,69],[-28,69],[0,115]];
+    const compactCenters=[[-28,-69],[28,-69],[28,-23],[-28,-23],[-28,23],[28,23],[28,69],[-28,69],[-32,115],[32,115]];
     const head=document.querySelector('.chart-head');
     let compactLayout=false;
     regions.forEach(([name,levels,x,z,grass,detached],i)=>{
       const firstVertex=verts.length/3, firstFace=faces.length;
       const n=19, shape=Array.from({length:n},(_,j)=>.95+.09*Math.cos(j*1.33+i)+random()*.09);
-      solid(x,z,[[-1,18,13],[-.8,17.4,12.4],[-.5,16,11.1],[.5,14.8,10.4],[2.1,14.4,10],[4,13.5,9.2]],n,detached?['#3c2f3f','#4c3a48','#9b8580','#7a5f52',grass,grass]:['#426f76','#528183','#b5c7ac','#a49174',grass,grass],.12,shape);
+      solid(x,z,[[-1,18,13],[-.8,17.4,12.4],[-.5,16,11.1],[.5,14.8,10.4],[2.1,14.4,10],[4,13.5,9.2]],n,[...({S1:['#3c2f3f','#4c3a48','#9b8580','#7a5f52'],S2:['#0c1d2e','#12293f','#2c5a6e','#21495c']}[detached]||['#426f76','#528183','#b5c7ac','#a49174']),grass,grass],.12,shape);
       if(i===0){hut(x-3,z,1.3);hut(x+3,z+2,.9);tower(x+3,z-3,5,'#bd7368');}
       if(i===1){for(let j=0;j<12;j++)pine(x+(random()-.5)*17,z+(random()-.5)*9,.8+random()*.9,j%2?'#578c65':'#759e70');}
       if(i===2){for(let j=0;j<3;j++)solid(x-5+j*4,z+j%2*2,[[4,3.8,3],[9+j*1.6,2.6,2.5],[12+j,1.3,1.1]],6,['#a58a67','#e5b381']);}
@@ -112,6 +113,19 @@
         for(const dx of [-8,-4.5])solid(x+dx,z+2,[[4,1.1,1.1],[12,.7,.7],[14,0,0]],4,['#5b4a63','#d6b46a'],Math.PI/4);
         for(const [dx,dz,h] of [[7,3,4],[9.5,0,6.5],[6,-4,3]])solid(x+dx,z+dz,[[4,.8,.8],[4+h,.8,.8]],6,['#cdb9a0']);
       }
+      if(i===9){
+        // Deep-sea isle: rising kraken tentacles, coral, kelp, glowing anemones and a wreck's mast.
+        // Decor sits toward the back so the portrait row in front does not hide it.
+        for(const [dx,dz,dir,h] of [[-6.5,-4.5,-1,.95],[6.5,-5,1,1.05],[.5,-7,.35,.85]])
+          solid(x+dx,z+dz,[[4,1.7,1.7],[7*h,1.3,1.3,dir*.8],[10*h,.95,.95,dir*2.1],[12.6*h,.6,.6,dir*3.7],[14.2*h,0,0,dir*5]],6,['#7c4796','#8f57aa','#a56cbd','#c08ad2']);
+        solid(x+2,z-2.5,[[4,4.4,1.8],[6,5,2.2]],4,['#5f4230'],.2);
+        solid(x+2.5,z-2.5,[[6,.3,.3],[14,.24,.24,-1.8]],5,['#4d3526']);
+        solid(x+1.2,z-2.5,[[11,1.8,.12,-1.2],[13.4,1.5,.12,-1.4]],4,['#d9cdb0']);
+        for(const [dx,dz,h,lean,col] of [[-10.5,-1,4.5,.6,'#ef7a91'],[-9.5,-5.2,3.5,-.5,'#f39a62'],[10.6,-1.5,5,-.7,'#ef7a91'],[9.6,-5.6,3.5,.5,'#ffb35c']])
+          solid(x+dx,z+dz,[[4,.7,.7],[4+h,.4,.4,lean],[4+h+.8,0,0,lean*1.3]],5,[col,'#ffd1dc']);
+        for(const [dx,dz,h] of [[-3.2,-6.5,7],[-2,-7.5,5.5],[3.6,-7.8,6]])solid(x+dx,z+dz,[[4,.35,.35],[4+h*.6,.28,.28,.5],[4+h,0,0,-.2]],5,['#2f9a74','#4cc08f']);
+        for(const [dx,dz] of [[-4.5,-1.5],[-1.5,-3.5],[5.5,-1],[8,-3]])solid(x+dx,z+dz,[[4,.65,.65],[5.3,.24,.24],[5.9,0,0]],6,['#5ff2dc','#b9fff4']);
+      }
       for(let j=0;j<5&&i<8;j++){let a=random()*6.28;const xx=x+Math.cos(a)*9,zz=z+Math.sin(a)*5;
         if([0,2,4,7].includes(i))pine(xx,zz,.5+random()*.48,i===7?'#82a7a0':'#699168');
         else solid(xx,zz,[[4,1.1,1],[5.3,.55,.6]],5,['#c3b49a']);}
@@ -119,8 +133,8 @@
       const group=document.createElement('div');
       group.className='island-bosses';
       group.setAttribute('role','group');
-      group.setAttribute('aria-label',name+' bosses');
-      if(detached)group.classList.add('detached');
+      group.setAttribute('aria-label',regionName(i)+' bosses');
+      if(detached)group.classList.add('detached',detached.toLowerCase());
       for(const boss of DATA.filter(b=>inRegion(b,i))){
         const button=document.createElement('button');
         button.className='boss-marker';
@@ -130,7 +144,7 @@
         group.append(button);
       }
       bossGroups.push(group);labels.append(group);
-      const pin=document.createElement('button');pin.className='pin';pin.setAttribute('aria-label',name+' — show bosses');pin.innerHTML='<i>'+(detached?'S1':String(i+1).padStart(2,'0'))+'</i><span>'+name+'</span>';if(detached)pin.classList.add('detached');pin.onclick=()=>choose(i);labels.append(pin);pins.push(pin);
+      const pin=document.createElement('button');pin.className='pin';pin.setAttribute('aria-label',regionName(i)+' — show bosses');pin.innerHTML='<i>'+(detached||String(i+1).padStart(2,'0'))+'</i><span>'+name+'</span>';if(detached)pin.classList.add('detached',detached.toLowerCase());pin.onclick=()=>choose(i);labels.append(pin);pins.push(pin);
     });
     const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));geometry.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
     scene.add(new THREE.Mesh(geometry,new THREE.MeshBasicMaterial({vertexColors:true,side:THREE.DoubleSide})));
@@ -180,17 +194,27 @@
       const v=new THREE.Vector3(sx/width*2-1,1-sy/height*2,0).unproject(camera),dir=new THREE.Vector3();
       camera.getWorldDirection(dir);const t=-v.y/dir.y;return [v.x+dir.x*t,v.z+dir.z*t];
     }
-    // The detached island sits in the free space to the right of the map title.
+    // Detached islands sit side by side in the free space to the right of the map title, with
+    // portraits shrunk to as little as 70% to fit there. Returns the portrait size they use.
     function placeDetached(headH,bossSize,gap){
-      const i=regions.findIndex(r=>r[5]);if(i<0)return;
+      const ids=regions.flatMap((r,i)=>r[5]?[i]:[]);if(!ids.length)return bossSize;
       const vpLeft=vp.getBoundingClientRect().left;
       const textRight=Math.max(...[...head.querySelectorAll('h1,p')].map(el=>el.getBoundingClientRect().right))-vpLeft;
-      const count=bossGroups[i].childElementCount,groupW=count*bossSize+(count-1)*gap,free=width-textRight;
-      let sx,sy;
-      if(free>=groupW+28){sx=textRight+free/2;sy=Math.max(headH*.72,bossSize*2.1);}
-      else{sx=width-groupW/2-14;sy=headH+bossSize*.6;}
-      const [x,z]=ground(sx,sy);
-      if(Math.hypot(x-islands[i].x,z+7-islands[i].z-7)>.3){moveIsland(i,x,z-7);settleMesh();}
+      const counts=ids.map(i=>bossGroups[i].childElementCount),n=counts.reduce((a,c)=>a+c,0),free=width-textRight;
+      // A row of n portraits in k groups, k-1 group gaps of .8 portrait: size*(n+.8(k-1)) + gap*(n-k).
+      const fit=Math.min(bossSize,Math.floor((free-28-gap*(n-ids.length))/(n+.8*(ids.length-1))));
+      const size=fit>=bossSize*.7?fit:bossSize,groupW=counts.map(c=>c*size+(c-1)*gap),between=size*.8;
+      const totalW=groupW.reduce((a,w)=>a+w,0)+between*(ids.length-1);
+      let left,sy;
+      if(size===fit){left=textRight+(free-totalW)/2;sy=Math.max(headH*.72,size*2.1);}
+      else{left=width-totalW-14;sy=headH+size*.6;}
+      let moved=false;
+      ids.forEach((i,k)=>{
+        const [x,z]=ground(left+groupW[k]/2,sy);left+=groupW[k]+between;
+        if(Math.hypot(x-islands[i].x,z-7-islands[i].z)>.3){moveIsland(i,x,z-7);moved=true;}
+      });
+      if(moved)settleMesh();
+      return size;
     }
     function draw(){
       width=vp.clientWidth;height=vp.clientHeight;if(!width||!height)return;
@@ -207,7 +231,7 @@
       const half=span/2,unit=span/width,cz=compactLayout?23:0;
       camera.left=-half;camera.right=half;camera.top=(mapH/2+headH)*unit;camera.bottom=-mapH/2*unit;
       camera.position.set(dx,165,dz+cz+145);camera.lookAt(dx,0,dz+cz);camera.updateProjectionMatrix();camera.updateMatrixWorld();
-      if(!compactLayout&&zoom===1)placeDetached(headH,bossSize,markerGap);
+      const detachedSize=!compactLayout&&zoom===1?placeDetached(headH,bossSize,markerGap):bossSize;
       if(renderer){renderer.setSize(width,height,false);renderer.render(scene,camera);}
       else{const d=Math.min(devicePixelRatio,2);canvas.width=width*d;canvas.height=height*d;ctx.setTransform(d,0,0,d,0,0);ctx.lineWidth=.45;
         for(const f of faces){const [a,b,c]=f.p.map(project);ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.lineTo(...c);ctx.closePath();ctx.fillStyle=ctx.strokeStyle=f.color;ctx.fill();ctx.stroke();}}
@@ -215,13 +239,14 @@
         const anchor=project(new THREE.Vector3(island.x,0,island.z));
         const [x,y]=project(new THREE.Vector3(island.x,1,island.z+7));
         const group = bossGroups[i];
-        const count = group.childElementCount;
+        const count = group.childElementCount, size = regions[i][5] ? detachedSize : bossSize;
+        group.style.setProperty('--boss-size', size + 'px');
         // Leave room for the outer portrait to grow on hover in the overview.
-        const margin = (count * bossSize + (count - 1) * markerGap) / 2 + bossSize * .325 + 2;
+        const margin = (count * size + (count - 1) * markerGap) / 2 + size * .325 + 2;
         const groupX = zoom === 1 ? Math.min(width - margin, Math.max(margin, x)) : x;
         group.style.left = groupX + 'px';
         group.style.top = y + 'px';
-        pins[i].style.left=x+'px';pins[i].style.top=(y+bossSize/2+5)+'px';
+        pins[i].style.left=x+'px';pins[i].style.top=(y+size/2+5)+'px';
         return anchor;
       });
       let route='';anchors.filter((a,i)=>!regions[i][5]).forEach(([x,y],i,anchors)=>{if(!i){route='M'+x+' '+y;return;}const [u,v]=anchors[i-1];route+=' Q '+((x+u)/2+(y-v)*.16)+' '+((y+v)/2-(x-u)*.16)+' '+x+' '+y;});
@@ -294,7 +319,7 @@
     setSums(null);
     document.getElementById('loadout').innerHTML = '';
     document.getElementById('slotTitle').textContent = 'Guide pending';
-    document.getElementById('slotSub').textContent = 'Apocalypse · S1 season · 2026/10/3 – 2027/1/1';
+    document.getElementById('slotSub').textContent = `${b.region} · ${b.season} season`;
     document.getElementById('hand').innerHTML = `<div class="card freecard q3"><div><b>Data pending</b>${esc(b.name)}'s element, race, size and card scores are not in the source dataset yet.<br><br>This guide will fill in once the data is added.</div></div>`;
     document.getElementById('scrollhint').textContent = '';
     lair.classList.add('pending');

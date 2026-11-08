@@ -1,28 +1,57 @@
-// Apocalypse (ดินแดนหายนะ) · S1 แดนสุสานคำสาปมรณะ · 2026/10/3 – 2027/1/1
-// Names and portraits are taken from the in-game season screen. Bosses that also exist as
-// regular MVPs reuse that MVP's element, race, size and card data (`from` = source id).
-// Bosses with no source data are marked as pending.
+// Apocalypse (ดินแดนหายนะ) season bosses. Each season is its own detached island.
+// Bosses that also exist as regular MVPs reuse that MVP's element, race, size and card data
+// (`from` = source id). A boss with no MVP twin is derived as A − B + C (`from` = [A, B, C]):
+// A gives race and size, C gives element, B has A's element and C's race. This reproduces all
+// 24 checkable combinations in the dataset exactly. Bosses with no source are marked as pending.
 (() => {
-  // Order follows the season path: Amon Ra → Pharaoh → Bloody Knight → Dark Lord → Anubis.
-  const BOSSES = [
-    [90001, 'Amon Ra', 'เซ็นย์ตื่นบรรทม', 'a1', 80014],
-    [90002, 'Pharaoh', 'ทราของราชาสุสา', 'a3', 80016],
-    [90003, 'Bloody Knight', 'เงาโลหิตพิโรธ', 'a2', 80022],
-    [90004, 'Dark Lord', 'จ้าวแห่งอเวจี', 'a4', 80018],
-    [90005, 'Anubis', 'นัขยมโลกกลืนวิญ', 'a5', null],
-  ];
-  // Anubis (Undead · Demi-Human · Large) has no MVP twin. Its cards were scored with the dataset's
-  // own rules: Demi-Human/Large/generic parts from Pharaoh, Undead parts from Dark Lord
-  // (Pharaoh − Baphomet + Dark Lord), then ranked best 2 per slot. Level is unknown.
-  const ANUBIS = {"lv":null,"race":"Demi-Human","el":"Undead","size":"Large","col":{"Neutral":1,"Water":1,"Earth":1,"Fire":1.5,"Wind":1,"Poison":0.25,"Holy":1.75,"Shadow":0.25,"Ghost":1.25,"Undead":0.25},"best_el":"Holy","el_bonus":75,"sum_lo":237.1,"sum_hi":275.5,"slots":{"Weapon":[{"name":"Hydra","icon":"assets/cards/icon_item_card_hk_01.webp","lo":12,"hi":20,"tier":"best","why":["race"],"q":4,"effect":["Damage against Demi-Human +12%–20%"]},{"name":"Goblin Leader","icon":"assets/cards/icon_item_card_gblsl_01.webp","lo":19.5,"hi":19.5,"tier":"best","why":["all races","Sovereign"],"q":5,"effect":["Damage against Goblins +30%. Damage against all races +12%. Sovereign damage +7.5%."]},{"name":"Minorous","icon":"assets/cards/icon_item_card_mls_01.webp","lo":10.8,"hi":18,"tier":"alt","why":["size"],"q":4,"effect":["Damage against Large targets +10.80%–18%"]},{"name":"Revived Abysmal Knight","icon":"assets/cards/icon_item_card_syqs_01.webp","lo":10,"hi":10,"tier":"alt","why":["vs Boss"],"q":4,"effect":["Damage against Boss, MVP, and Mini monsters +10%."]},{"name":"Owl Baron","icon":"assets/cards/icon_item_card_exnj_01.webp","lo":7.5,"hi":7.5,"tier":"alt","why":["Sovereign"],"q":5,"effect":["Matk +80","Sovereign damage +7.50%","Unique: Above 50% SP, dealing magic damage has a 50% chance to spend 5% SP and increase damage by 50%. Below 50% SP, dealing magic damage has a 50% chance to restore 5% SP."]},{"name":"Phreeoni","icon":"assets/cards/icon_item_card_pln_01.webp","lo":7.5,"hi":7.5,"tier":"alt","why":["Sovereign"],"q":5,"effect":["Hit +100","Physical damage bonus +15%","Sovereign damage +7.50%"]},{"name":"Dracula","icon":"assets/cards/icon_item_card_dglnj_01.webp","lo":7.5,"hi":7.5,"tier":"alt","why":["Sovereign"],"q":5,"effect":["Atk +80","Sovereign damage +7.50%","Unique: Above 50% SP, physical attacks or skills have a 50% chance to spend 5% SP and increase damage by 50%. Below 50% SP, dealing physical damage has a 50% chance to restore 5% SP."]},{"name":"Doppelganger","icon":"assets/cards/icon_item_card_sl_02.webp","lo":7.5,"hi":7.5,"tier":"alt","why":["Sovereign"],"q":5,"effect":["Attack speed +10%","Critical +20","Critical damage +15%","Sovereign damage +7.50%"]},{"name":"Atroce","icon":"assets/cards/icon_item_card_atls_01.webp","lo":7.5,"hi":7.5,"tier":"alt","why":["Sovereign"],"q":5,"effect":["Physical damage bonus +15%","Atk +50","Sovereign damage +7.50%","Dealing physical damage has a 1% chance to set your ASPD to 193 for 5 seconds. Cooldown: 12 seconds."]},{"name":"Baphomet","icon":"assets/cards/icon_item_card_bft_01.webp","lo":5,"hi":5,"tier":"alt","why":["Sovereign"],"q":5,"effect":["Sovereign damage +5%","Unique: Basic attacks deal 75% splash damage to up to 10 enemies within 3 meters."]},{"name":"Drake","icon":"assets/cards/icon_item_card_hdzw_01.webp","lo":5,"hi":5,"tier":"alt","why":["Sovereign"],"q":5,"effect":["Base size modifier +25%","Sovereign damage +5%","Ignores weapon size penalties."]}],"Armor":[{"name":"Bathory","icon":"assets/cards/icon_item_card_wp_01.webp","lo":75,"hi":75,"tier":"best","why":["armor→Shadow"],"q":4,"effect":["Changes the armor element to Shadow."]},{"name":"Argiope","icon":"assets/cards/icon_item_card_ajowg_01.webp","lo":50,"hi":50,"tier":"alt","why":["armor→Poison"],"q":4,"effect":["Changes the armor element to Poison."]},{"name":"Angeling","icon":"assets/cards/icon_item_card_tsbl_01.webp","lo":-25,"hi":-25,"tier":"bad","why":["armor→Holy"],"q":5,"effect":["Holy damage reduction +10%","Changes the armor element to Holy."]}],"Off-hand":[{"name":"Frozen Gargoyle","icon":"assets/cards/icon_item_card_bdbfgjs_01.webp","lo":12,"hi":20,"tier":"best","why":["size taken"],"q":4,"effect":["Damage reduction against Large targets +12%–20%"]},{"name":"Thara Frog","icon":"assets/cards/icon_item_card_dlw_01.webp","lo":12,"hi":20,"tier":"best","why":["race taken"],"q":4,"effect":["Damage reduction against Demi-Human +12%–20%"]},{"name":"Alice","icon":"assets/cards/icon_item_card_alsnp_01.webp","lo":10,"hi":10,"tier":"alt","why":["monster taken"],"q":4,"effect":["Damage taken from monsters −10%."]},{"name":"Golden Thief Bug","icon":"assets/cards/icon_item_card_hjc_01.webp","lo":5,"hi":5,"tier":"alt","why":["Sovereign taken"],"q":5,"effect":["Sovereign damage reduction +5%","Unique: Negates an incoming magic hit and grants a Golden Thief Bug shield for 10 seconds, reducing further magic damage taken by 50%. Cooldown: 25 seconds."]},{"name":"Maya","icon":"assets/cards/icon_item_card_yh_01.webp","lo":5,"hi":5,"tier":"alt","why":["Sovereign taken"],"q":5,"effect":["Sovereign damage reduction +5%","Unique: 50% chance to reflect 30% of magic damage. Reflection does not affect Boss, MVP, or Mini monsters."]}],"Garment":[{"name":"Orc Zombie","icon":"assets/cards/icon_item_card_srfs_01.webp","lo":3,"hi":5,"tier":"best","why":["element taken"],"q":3,"effect":["Undead damage reduction +3%–5%"]},{"name":"Deviling","icon":"assets/cards/icon_item_card_embl_01.webp","lo":-5,"hi":-5,"tier":"bad","why":["Sovereign taken","neutral rule"],"q":5,"effect":["Neutral damage taken −30%. Damage taken from other elements +10%. Sovereign damage reduction +5%."]}],"Headgear":[{"name":"Illusion Orc Lord","icon":"assets/cards/icon_item_card_srqz_01.webp","lo":3.6,"hi":6,"tier":"best","why":["size taken"],"q":4,"effect":["Damage reduction against Large targets +3.60%–6%"]},{"name":"Mistress","icon":"assets/cards/icon_item_card_fh_01.webp","lo":5,"hi":5,"tier":"best","why":["Sovereign"],"q":5,"effect":["Magic damage bonus +15%","Sovereign damage +5%","Unique: Skill SP cost −20%."]},{"name":"Illusion Sealed Orc Lord","icon":"assets/cards/icon_item_card_srqz_01.webp","lo":1.2,"hi":2,"tier":"alt","why":["size taken"],"q":3,"effect":["Damage reduction against Large targets +1.20%–2%"]}],"Face":[{"name":"Illusion Dracula","icon":"assets/cards/icon_item_card_dglnj_01.webp","lo":3.6,"hi":6,"tier":"best","why":["race"],"q":4,"effect":["Damage against Demi-Human +3.60%–6%"]},{"name":"Illusion Sealed Dracula","icon":"assets/cards/icon_item_card_dglnj_01.webp","lo":1.2,"hi":2,"tier":"best","why":["race"],"q":3,"effect":["Damage against Demi-Human +1.20%–2%"]}],"Back":[{"name":"Illusion Angeling","icon":"assets/cards/icon_item_card_tsbl_01.webp","lo":3.6,"hi":6,"tier":"best","why":["size"],"q":4,"effect":["Damage against Large targets +3.60%–6%"]},{"name":"Illusion Mistress","icon":"assets/cards/icon_item_card_fh_01.webp","lo":3.6,"hi":6,"tier":"best","why":["race taken"],"q":4,"effect":["Damage reduction against Demi-Human +3.60%–6%"]},{"name":"Illusion Sealed Mistress","icon":"assets/cards/icon_item_card_fh_01.webp","lo":1.2,"hi":2,"tier":"alt","why":["race taken"],"q":3,"effect":["Damage reduction against Demi-Human +1.20%–2%"]}],"Accessory":[{"name":"Cookie","icon":"assets/cards/icon_item_card_lbr_01.webp","lo":3,"hi":5,"tier":"best","why":["Holy dmg"],"q":4,"effect":["Holy attack damage +3%–5%"]}],"Shoes":[{"name":"Eddga","icon":"assets/cards/icon_item_card_hw_01.webp","lo":5,"hi":5,"tier":"best","why":["Sovereign taken"],"q":5,"effect":["Sovereign damage reduction +5%","Unique: Blocks one hard crowd-control effect and increases all control resistance by 70% for 5 seconds. Cooldown: 20 seconds."]}]}};
+  const SEASONS = {
+    // S1 แดนสุสานคำสาปมรณะ · 2026/10/3 – 2027/1/1. Names and portraits from the in-game season
+    // screen; level is the source MVP's. Anubis = Pharaoh − Baphomet + Dark Lord, level unknown.
+    S1: { bosses: [
+      [90001, 'Amon Ra', 'เซ็นย์ตื่นบรรทม', 'a1', 80014],
+      [90002, 'Pharaoh', 'ทราของราชาสุสา', 'a3', 80016],
+      [90003, 'Bloody Knight', 'เงาโลหิตพิโรธ', 'a2', 80022],
+      [90004, 'Dark Lord', 'จ้าวแห่งอเวจี', 'a4', 80018],
+      [90005, 'Anubis', 'นัขยมโลกกลืนวิญ', 'a5', [80016, 40023, 80018]],
+    ] },
+    // S2 冰封海淵 (Frozen Abyss) · Taiwan server, 360 days, Lv100 bosses. Names follow the
+    // matching MVP; Crystal Queen (幻晶女王) and Ancient Sea God (遠古海神) are translated.
+    // Crystal Queen = Dracula − Atroce + Garm (Owl Baron − Phreeoni + Garm gives the same cards).
+    S2: { lv: 100, bosses: [
+      [90006, 'Stormy Knight', null, 'b1', 80025],
+      [90007, 'Crystal Queen', null, 'b2', [80010, 80019, 80024]],
+      [90008, 'Ancient Sea God', null, 'b3', 80008],
+      [90009, 'Kraken', null, 'b4', 80008],
+      [90010, 'Garm', null, 'b5', 80024],
+    ] },
+  };
+  const byId = id => window.RO_DATA.find(b => b.id === id);
+  const isElementTag = t => ['vs element', 'element taken', 'neutral rule'].includes(t) || t.startsWith('armor→') || t.endsWith(' dmg');
+  function derive(A, B, C) {
+    const slots = {};
+    for (const s of Object.keys(A.slots)) {
+      const cards = boss => new Map((boss.slots[s] || []).map(c => [c.name, c]));
+      const a = cards(A), b = cards(B), c = cards(C), list = [];
+      for (const name of new Set([...c.keys(), ...a.keys(), ...b.keys()])) {
+        const ca = a.get(name), cb = b.get(name), cc = c.get(name);
+        const score = k => Math.round(((ca?.[k] || 0) - (cb?.[k] || 0) + (cc?.[k] || 0)) * 10) / 10;
+        const lo = score('lo'), hi = score('hi');
+        if (!lo && !hi) continue;
+        const why = [...new Set([...(ca?.why || []).filter(t => !isElementTag(t)), ...(cc?.why || []).filter(t => isElementTag(t) || !ca)])];
+        list.push({ ...(ca || cc || cb), lo, hi, tier: hi < 0 ? 'bad' : 'alt', why });
+      }
+      slots[s] = list;
+    }
+    return { lv: null, race: A.race, el: C.el, size: A.size, col: C.col, best_el: C.best_el, el_bonus: C.el_bonus, slots };
+  }
   const KEEP = ['lv', 'race', 'el', 'size', 'col', 'best_el', 'el_bonus', 'sum_lo', 'sum_hi', 'slots'];
-  BOSSES.forEach(([id, name, th, file, from]) => {
-    const img = 'apoc_' + file, src = window.RO_DATA.find(b => b.id === from);
+  for (const [season, { lv, bosses }] of Object.entries(SEASONS)) for (const [id, name, th, file, from] of bosses) {
+    const img = 'apoc_' + file, src = Array.isArray(from) ? derive(...from.map(byId)) : byId(from);
     window.RO_TEX[img] = 'assets/apocalypse/' + file + '.webp';
-    const boss = { id, name, th, img, region: 'Apocalypse', season: 'S1', from };
+    const boss = { id, name, th, img, region: 'Apocalypse', season, from };
     if (src) KEEP.forEach(k => { boss[k] = src[k]; });
-    else if (name === 'Anubis') Object.assign(boss, ANUBIS);
     else Object.assign(boss, { pending: true, col: {}, slots: {} });
+    if (lv) boss.lv = lv;
     window.RO_DATA.push(boss);
-  });
+  }
 })();
